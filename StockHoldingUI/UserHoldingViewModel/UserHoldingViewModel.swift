@@ -15,17 +15,27 @@ class UserHoldingViewModel {
     
     var stockDataSource: StockDataSource?
     private let api: UserHoldingAPIProtocol
+    private let networkMonitor: NetworkMonitor
     
     // Dependency injection via initializer
-    init(api: UserHoldingAPIProtocol = UserHoldingAPI.shared) {
+    init(api: UserHoldingAPIProtocol = UserHoldingAPI.shared, networkMonitor: NetworkMonitor = NetworkMonitor.shared) {
         self.api = api
-        self.getData()
+        self.networkMonitor = networkMonitor
+        NotificationCenter.default.addObserver(self, selector: #selector(networkStatusChanged), name: .networkStatusChanged, object: nil)
     }
     
     func getData() {
-        Task {
-            await fetchData()
+        if networkMonitor.isConnected {
+            Task {
+                await fetchData()
+            }
+        } else {
+            self.stockDataSource?.isAPIFailed(error: APIError(code: 500, status: "No Internet", message: "No Internet connection"))
         }
+    }
+    
+    @objc private func networkStatusChanged() {
+        self.getData()
     }
     
     /// Fetches user holding data.

@@ -35,11 +35,13 @@ class UserHoldingViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.stockViewModal.stockDataSource = self
+        self.stockViewModal.getData()
         self.tableView.register(UINib(nibName: UserHoldingTableViewCell.reuseIdentifier, bundle: nil), forCellReuseIdentifier: UserHoldingTableViewCell.reuseIdentifier)
         self.bottomCardView.makeTopCornersRounded(radius: 8)
         self.addBottomSpaceToTableView(space: 56)
         self.activityIndicator.startAnimating()
-        self.stockViewModal.stockDataSource = self
+        
     }
     
     @IBAction func expandButtonAction(_ sender: UIButton) {
